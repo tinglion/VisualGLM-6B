@@ -11,14 +11,17 @@ from sat.quantization.kernels import quantize
 import hashlib
 from .visualglm import VisualGLMModel
 
-def get_infer_setting(gpu_device=0, quant=None):
+def get_infer_setting(gpu_device=0, quant=None, model_path='visualglm-6b'):
     os.environ['CUDA_VISIBLE_DEVICES'] = str(gpu_device)
     args = argparse.Namespace(
         fp16=True,
         skip_init=True,
-        device='cuda' if quant is None else 'cpu',
+        # use_gpu_initialization=True,
+        device='cuda',
     )
-    model, args = VisualGLMModel.from_pretrained('visualglm-6b', args)
+    # model, args = VisualGLMModel.from_pretrained('visualglm-6b', args)
+    model, args = VisualGLMModel.from_pretrained(model_path, args)
+
     model.add_mixin('auto-regressive', CachedAutoregressiveMixin())
     assert quant in [None, 4, 8]
     if quant is not None:

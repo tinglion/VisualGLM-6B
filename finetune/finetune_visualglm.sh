@@ -18,8 +18,8 @@ OPTIONS_NCCL="NCCL_DEBUG=info NCCL_IB_DISABLE=0 NCCL_NET_GDR_LEVEL=2"
 HOST_FILE_PATH="hostfile"
 HOST_FILE_PATH="hostfile_single"
 
-train_data="./fewshot-data/dataset.json"
-eval_data="./fewshot-data/dataset.json"
+train_data="./jiao_data/V1/dataset.json"
+eval_data="./jiao_data/V1/dataset.json"
 
 
 gpt_options=" \
@@ -43,7 +43,7 @@ gpt_options=" \
        --eval-batch-size 8 \
        --zero-stage 1 \
        --lr 0.0001 \
-       --batch-size 4 \
+       --batch-size 8 \
        --skip-init \
        --fp16 \
        --use_lora

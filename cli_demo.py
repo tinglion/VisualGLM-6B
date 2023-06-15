@@ -26,21 +26,36 @@ def main():
     parser.add_argument("--prompt_en", type=str, default="Describe the image.", help='English prompt for the first round')
     args = parser.parse_args()
 
+    # torch.distributed.init_process_group('nccl', init_method='env://')
+    # rank = torch.distributed.get_rank()
+    # print(f"rank = {rank} is initialized")
+    # # 单机多卡情况下，localrank = rank. 严谨应该是local_rank来设置device
+    # torch.cuda.set_device(rank)
+
     # load model
     model, model_args = AutoModel.from_pretrained(
         args.from_pretrained,
         args=argparse.Namespace(
         fp16=True,
         skip_init=True,
+        num_gpus=2,
         use_gpu_initialization=True if (torch.cuda.is_available() and args.quant is None) else False,
         device='cuda' if (torch.cuda.is_available() and args.quant is None) else 'cpu',
     ))
+
+    # from accelerate import dispatch_model
+    # from utils import auto_configure_device_map
+    # if device_map is None:
+    #     device_map = auto_configure_device_map(num_gpus=2)
+    # model = dispatch_model(model, device_map=device_map)
+
     model = model.eval()
 
     if args.quant:
         quantize(model.transformer, args.quant)
-        if torch.cuda.is_available():
-            model = model.cuda()
+    
+    if torch.cuda.is_available():
+        model = model.cuda()
 
     model.add_mixin('auto-regressive', CachedAutoregressiveMixin())
 
@@ -91,7 +106,7 @@ def main():
                     print(e)
                     break
                 sep = 'A:' if args.english else '答：'
-                print("VisualGLM-6B："+response.split(sep)[-1].strip())
+                print("大模型："+response.split(sep)[-1].strip())
                 image_path = None
                 if not args.english:
                     query = input("用户：")

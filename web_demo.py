@@ -62,25 +62,25 @@ def request_model(input_text, temperature, top_p, image_prompt, result_previous)
     return "", result_text
 
 
-DESCRIPTION = '''# <a href="https://github.com/THUDM/VisualGLM-6B">VisualGLM</a>'''
+DESCRIPTION = '''# 大模型图片自动标注'''
 
-MAINTENANCE_NOTICE1 = 'Hint 1: If the app report "Something went wrong, connection error out", please turn off your proxy and retry.\nHint 2: If you upload a large size of image like 10MB, it may take some time to upload and process. Please be patient and wait.'
+MAINTENANCE_NOTICE1 = '提示1: 如果应用报了“Something went wrong, connection error out”的错误，请关闭代理并重试。\n提示2: 如果你上传了很大的图片，比如10MB大小，那将需要一些时间来上传和处理，请耐心等待。'
 MAINTENANCE_NOTICE2 = '提示1: 如果应用报了“Something went wrong, connection error out”的错误，请关闭代理并重试。\n提示2: 如果你上传了很大的图片，比如10MB大小，那将需要一些时间来上传和处理，请耐心等待。'
 
-NOTES = 'This app is adapted from <a href="https://github.com/THUDM/VisualGLM-6B">https://github.com/THUDM/VisualGLM-6B</a>. It would be recommended to check out the repo if you want to see the detail of our model and training process.'
+NOTES = '大模型图片自动标注'
 
 
 def clear_fn(value):
-    return "", [("", "Hi, What do you want to know about this image?")], None
+    return "", [("", "你想了解什么?")], None
 
 def clear_fn2(value):
-    return [("", "Hi, What do you want to know about this image?")]
+    return [("", "你想了解什么?")]
 
 
 def main(args):
     gr.close_all()
     global model, tokenizer
-    model, tokenizer = get_infer_setting(gpu_device=0, quant=args.quant)
+    model, tokenizer = get_infer_setting(gpu_device=0, quant=args.quant, model_path=args.model)
     
     with gr.Blocks(css='style.css') as demo:
         gr.Markdown(DESCRIPTION)
@@ -124,6 +124,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--quant", choices=[8, 4], type=int, default=None)
     parser.add_argument("--share", action="store_true")
+    parser.add_argument("--model", default='visualglm-6b')
     args = parser.parse_args()
 
     main(args)
